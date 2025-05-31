@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>List of Products:</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #2e264a;
+            color: #dcdcdc;
+        }
+        .product {
+            border: 1px solid #333;
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #241d22;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .product h3 {
+            margin: 0;
+            color: #dcdcdc;
+        }
+        .product p {
+            margin: 5px 0;
+        }
+        .buy-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            color: #fff;
+            background-color: #ff4d4d;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 77, 77, 0.6);
+            font-weight: bold;
+        }
+        .buy-button:hover {
+            background-color: #cc0000;
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(255, 77, 77, 0.8);
+        }
+        .language-button {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+        .language-button img {
+            width: 20px;
+            height: 20px;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 99;
+        }
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #31383d;
+            border: 1px solid #333;
+            border-radius: 15px;
+            width: 350px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+        }
+        .payment-option {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #444;
+            border-radius: 10px;
+            background: #2e264a;
+            color: #dcdcdc;
+        }
+        .payment-option p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .payment-option code {
+            font-family: monospace;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .payment-option button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            background: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        .payment-option button:hover {
+            background: #0056b3;
+        }
+        .close-button {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="pageTitle">List of Products:</h1>
+    <div id="products"></div>
+
+    <div id="overlay" class="overlay" onclick="closeModal()"></div>
+
+    <div id="paymentModal" class="payment-modal">
+        <div class="modal-header" id="modalHeader">Choose payment method:</div>
+        <div class="modal-content" id="modalContent"></div>
+        <button class="close-button" onclick="closeModal()">X</button>
+    </div>
+
+    <script>
+        let isEnglish = true;
+
+        const productsData = {
+            ru: [
+                { name: "Купить все", price: "3600 RUB", description: "Все ниже перечисленные материалы за одну покупку" },
+                { name: "👧Шkoльнuцы 2ТБ", price: "2700 RUB", description: "Сборник контента 7-16 лет. Более 2ТБ" },
+                { name: "👧Шkoльнuцы 1ТБ", price: "1300 RUB", description: "Сборник контента 7-16 лет. Более 1ТБ" },
+                { name: "👧Шkoльнuцы 700ГБ", price: "950 RUB", description: "Сборник контента 7-16 лет. Более 700ГБ" },
+                { name: "👧Шkoльнuцы 500ГБ", price: "750 RUB", description: "Сборник контента 7-16 лет. Более 500ГБ" },
+                { name: "👧Шkoльнuцы 200ГБ", price: "450 RUB", description: "Сборник контента 7-16 лет. Более 200ГБ." },
+                { name: "👧Шkoльнuцы 100ГБ", price: "350 RUB", description: "Сборник контента 7-16 лет. Более 100ГБ" },
+                { name: "👧Шkoльнuцы 50ГБ", price: "250 RUB", description: "Сборник контента 7-16 лет. Более 50ГБ" },
+                { name: "👧🏾Тeмнoкoжue шкoл", price: "230 RUB", description: "Сборник контента 7-16 лет. Множество видео, фото, сoло, uнцecт" },
+                { name: "👨‍👩‍👧‍👦Инцecт", price: "300 RUB", description: "По названию тарифа, думаю понятно какой материал присутствует" }
+            ],
+            en: [
+                { name: "Buy everything", price: "36$", description: "All the materials listed below for one purchase" },
+                { name: "👧Schoolgirls 2TB", price: "27$", description: "Collection of content for 7-16 years. More than 2TB" },
+                { name: "👧Schoolgirls 1TB", price: "13$", description: "Collection of content for 7-16 years. More than 1TB" },
+                { name: "👧Schoolgirls 700GB", price: "9.5$", description: "Collection of content for 7-16 years. More than 700GB" },
+                { name: "👧Schoolgirls 500GB", price: "7.5$", description: "Collection of content for 7-16 years. More than 500GB" },
+                { name: "👧Schoolgirls 200GB", price: "4.5$", description: "Collection of content for 7-16 years. More than 200GB" },
+                { name: "👧Schoolgirls 100GB", price: "3.5$", description: "Collection of content for 7-16 years. More than 100GB" },
+                { name: "👧Schoolgirls 50GB", price: "2.5$", description: "Collection of content for 7-16 years. More than 50GB" },
+                { name: "👧🏾Black schools", price: "2.3$", description: "Collection of content for 7-16 years. Lots of videos, photos, solo, incest" },
+                { name: "👨‍👩‍👧‍👦Incest", price: "3$", description: "By the name of the tariff, I think it's clear what kind of material is present" }
+            ]
+        };
+
+        function renderProducts() {
+            const productsDiv = document.getElementById("products");
+            productsDiv.innerHTML = '';
+            const products = isEnglish ? productsData.en : productsData.ru;
+
+            products.forEach(product => {
+                const productDiv = document.createElement("div");
+                productDiv.className = "product";
+                productDiv.innerHTML = `
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <p><strong>${isEnglish ? "Price" : "Цена"}:</strong> ${product.price}</p>
+                    <button class="buy-button" onclick="openModal('${product.name}')">
+                        ${isEnglish ? "Buy" : "Купить"}
+                    </button>
+                `;
+                productsDiv.appendChild(productDiv);
+            });
+        }
+
+        function openModal(productName) {
+            const modalContent = document.getElementById("modalContent");
+            const modalHeader = document.getElementById("modalHeader");
+            modalHeader.textContent = isEnglish ? "Choose payment method:" : "Выберите способ оплаты:";
+            modalContent.innerHTML = isEnglish
+                ? `
+                    <div class="payment-option">
+                        💰 Pay by cryptocurrency
+                        <p>
+                            <code>TXvxaa1aeSQ5GzHkD4KzrCFvyuqNTH5HrW</code>
+                            <button onclick="copyToClipboard('TXvxaa1aeSQ5GzHkD4KzrCFvyuqNTH5HrW')">Copy</button>
+                        </p>
+                        <p>
+                            💸 Use <a href="https://t.me/cryptobot" target="_blank">@cryptobot</a> for transactions Or follow the link http://t.me/send?start=IVMvvGIVnN28
+                        </p>
+                    </div>
+                `
+                : `
+                    <div class="payment-option">
+                        💳 Оплатить картой
+                        <p>
+                            <code>2202208324742866</code>
+                            <button onclick="copyToClipboard('2202208324742866')">Скопировать</button>
+                        </p>
+                        <p>🏧 Банк: СберБанк 🟢</p>
+                    </div>
+                `;
+            document.getElementById("overlay").style.display = "block";
+            document.getElementById("paymentModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("paymentModal").style.display = "none";
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert(isEnglish ? "Copied: " + text : "Скопировано: " + text);
+            });
+        }
+
+        function toggleLanguage() {
+            isEnglish = !isEnglish;
+            document.getElementById("pageTitle").innerText = isEnglish ? "List of Products:" : "Список товаров:";
+            renderProducts();
+        }
+
+        renderProducts();
+    </script>
+
+    <button class="language-button" onclick="toggleLanguage()">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/globe.png" alt="Сменить язык">
+    </button>
+</body>
+</html>
